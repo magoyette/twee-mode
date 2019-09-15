@@ -250,7 +250,7 @@
          ("Passages" "^::[[:space:]]*\\(.*\\)$" 1)))
 
   (add-to-list 'completion-at-point-functions
-               'twee-chapbook--completion-at-point))
+               'twee-chapbook-mode--completion-at-point))
 
 (provide 'twee-chapbook-mode)
 ;;; twee-chapbook-mode.el ends here
