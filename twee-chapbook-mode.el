@@ -39,7 +39,51 @@
     table))
 
 (defconst twee-chapbook-mode--keywords
-  '("TODO"))
+  '(
+    ;; Header and Footer
+    "config.footer.left"
+    "config.footer.center"
+    "config.footer.right"
+    "config.header.left"
+    "config.header.center"
+    "config.header.right"
+    ;; Web Fonts
+    "config.style.googleFont"
+    "config.style.typekitFont"
+    "config.style.fonts.<font-name>.url"
+    "config.style.fonts.<font-name>.name"
+    ;; Text Style
+    "config.style.header.font"
+    "config.style.header.link.font"
+    "config.style.header.link.active.font"
+    "config.style.page.font"
+    "config.style.page.link.font"
+    "config.style.page.link.active.font"
+    ;; Colors
+    "config.style.backdrop"
+    "config.style.page.color"
+    "config.style.page.link.color"
+    "config.style.page.link.lineColor"
+    "config.style.page.link.active.color"
+    "config.style.page.link.active.lineColor"
+    "config.style.page.color"
+    "config.style.page.link.color"
+    "config.style.page.link.lineColor"
+    "config.style.page.link.active.color"
+    "config.style.page.link.active.lineColor"
+    ;; Page Style
+    "config.style.pageStyle"
+    "config.body.transition.name"
+    "config.body.transition.duration"
+    "config.header.transition.name"
+    "config.header.transition.duration"
+    "config.footer.transition.name"
+    "config.footer.transition.duration"
+    ;; Forks
+    "config.style.page.fork.divider.style"
+    "config.style.page.fork.divider.size"
+    "config.style.page.fork.divider.color"
+))
 
 (defun twee-chapbook-mode--completion-at-point ()
   "Completion function for Twee files for the Chapbook story format."
