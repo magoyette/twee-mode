@@ -231,108 +231,6 @@
      (2 font-lock-string-face t))
     ))
 
-;; Adapted from outshine-narrow-to-subtree in
-;; https://github.com/alphapapa/outshine
-;; and narrow-or-widen-dwim in
-;; http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
-;;;###autoload
-(defun twee-chapbook-narrow-to-subtree-or-widen ()
-  "Narrow buffer to subtree at point or widen if buffer is narrowed."
-  (interactive)
-  (cond ((buffer-narrowed-p) (widen))
-        ((if (outline-on-heading-p)
-             (progn
-               (outline-mark-subtree)
-               (and
-                (use-region-p)
-                (narrow-to-region (region-beginning) (region-end)))
-               (deactivate-mark))
-           (message "Not at headline, cannot narrow to subtree")))))
-
-;; Adapted from outline-magic
-;; https://github.com/tj64/outline-magic
-;;;###autoload
-(defun twee-chapbook--outline-next-line ()
-  "Forward line, but mover over invisible line ends.
-Essentially a much simplified version of `next-line'."
-  (interactive)
-  (beginning-of-line 2)
-  (while (and (not (eobp))
-              (get-char-property (1- (point)) 'invisible))
-    (beginning-of-line 2)))
-
-;; Adapted from outline-magic
-;; https://github.com/tj64/outline-magic
-;;;###autoload
-(defun twee-chapbook-outline-toggle (&optional arg)
-  "Visibility toggling for outline(-minor)-mode.
-- When point is at the beginning of the buffer, or when called with a
-  C-u prefix argument, rotate the entire buffer through 2 states:
-  1. OVERVIEW: Show only top-level headlines.
-  2. SHOW ALL: Show everything.
-- When point is at the beginning of a headline, rotate the subtree started
-  by this line through 2 different states:
-  1. FOLDED:   Only the main headline is shown.
-  2. SUBTREE:  Show the entire subtree, including body text.
-- When point is not at the beginning of a headline, jump to the current
-  headline."
-  (interactive "P")
-  (setq deactivate-mark t)
-  (cond
-   ((equal arg '(4))
-    ;; Run `twee-chapbook-outline-toggle' as if at the top of the buffer.
-    (save-excursion
-      (goto-char (point-min))
-      (let ((current-prefix-argument nil))
-        (twee-chapbook-outline-toggle nil))))
-   (t
-    (cond
-     ((bobp) ;; Beginning of buffer: Global cycling
-      (cond
-       ((eq last-command 'outline-toggle-overview)
-        ;; We just showed the table of contents - now show everything
-        (show-all)
-        (message "SHOW ALL")
-        (setq this-command 'outline-toggle-showall))
-       (t
-        ;; Default action: go to overview
-        (let ((toplevel (cond
-                         (current-prefix-arg (prefix-numeric-value current-prefix-arg))
-                         ((save-excursion (beginning-of-line)
-                                          (looking-at outline-regexp))
-                          (max 1 (funcall outline-level)))
-                         (t 1))))
-          (hide-sublevels toplevel))
-        (message "OVERVIEW")
-        (setq this-command 'outline-toggle-overview))))
-
-     ((save-excursion (beginning-of-line 1) (looking-at outline-regexp))
-      ;; At a heading: rotate between two different views
-      (outline-back-to-heading)
-      (let ((goal-column 0) beg eoh eol eos)
-        ;; First, some boundaries
-        (save-excursion
-          (outline-back-to-heading)           (setq beg (point))
-          (save-excursion (twee-chapbook--outline-next-line) (setq eol (point)))
-          (outline-end-of-heading)            (setq eoh (point))
-          (outline-end-of-subtree)            (setq eos (point)))
-        ;; Find out what to do next and set `this-command'
-        (cond
-         ((= eos eoh)
-          ;; Nothing is hidden behind this heading
-          (message "EMPTY ENTRY"))
-         ((>= eol eos)
-          ;; Entire subtree is hidden in one line: open it
-          (show-subtree)
-          (message "SUBTREE"))
-         (t
-          ;; Default action: hide the subtree.
-          (hide-subtree)
-          (message "FOLDED")))))
-     (t
-      ;; Not at a headline: Jump to headline.
-      (outline-back-to-heading))))))
-
 (defalias 'twee-chapbook-parent-mode
   (if (fboundp 'prog-mode) 'prog-mode 'fundamental-mode))
 
@@ -344,13 +242,6 @@ Essentially a much simplified version of `next-line'."
 
   (set (make-local-variable 'font-lock-defaults)
        '(twee-chapbook-mode--font-lock-keywords nil nil))
-
-  (set (make-local-variable 'imenu-generic-expression)
-       '(("Links" "[[][[]\\([^]]*\\)[]][]]" 1)
-         ("Passages" "^::[[:space:]]*\\(.*\\)$" 1)))
-
-  (set (make-local-variable 'outline-regexp) "^::")
-  (outline-minor-mode)
 
   (setq-local completion-ignore-case t)
 
