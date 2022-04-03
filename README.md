@@ -6,6 +6,8 @@
 
 [twee-chapbook-mode](https://github.com/magoyette/twee-chapbook-mode) is a major mode for the Chapbook story format. Other Twine story formats currently have no Emacs major mode.
 
+This project is now archived and no longer maintained.
+
 ## Features
 
 - Display a menu to navigate to a passage header with Imenu
